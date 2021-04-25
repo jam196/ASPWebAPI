@@ -1,0 +1,11 @@
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\WebAPI.exe
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\appsettings.Development.json
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\appsettings.json
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\WebAPI.dll
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\WebAPI.deps.json
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\WebAPI.runtimeconfig.json
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\WebAPI.pdb
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\Microsoft.OpenApi.dll
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\Swashbuckle.AspNetCore.Swagger.dll
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\RiderProjects\WebAPI\WebAPI\bin\Debug\net5.0\publish\Swashbuckle.AspNetCore.SwaggerUI.dll
