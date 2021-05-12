@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using WebAPI.Helpers;
 
 namespace WebAPI
 {
@@ -81,6 +83,13 @@ namespace WebAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.UseMiddleware<JwtMiddleware>();
+            
+            // app.Run(async (context) =>
+            // {
+            //     await context.Response.WriteAsync("Tesssssssssssssssssssst");
+            // });
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

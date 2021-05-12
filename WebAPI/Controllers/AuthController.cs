@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +25,7 @@ namespace WebAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DbContext _context;
+
         public AuthController(DbContext context)
         {
             _context = context;
@@ -35,12 +39,14 @@ namespace WebAPI.Controllers
             String passwordHash = EncodePassword(userData.Password);
             var status = "success";
             var message = "Đăng nhập thành công";
+            int statusCode = 200;
 
             try
             {
                 user = _context.User.First(u => u.Username == userData.Username);
                 if (passwordHash != user.Password)
                 {
+                    statusCode = 401;
                     status = "error";
                     message = "Sai mật khẩu";
                 }
@@ -56,30 +62,31 @@ namespace WebAPI.Controllers
 
                 user = userData;
             }
-            
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("E465A3CCC379D80B29DFB0F2D30276E1");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[] 
+                Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role ?? "")
+                    new("id", user.Id.ToString()),
+                    new("role", user.Role ?? "")
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddDays(365),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
+            var token = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
 
             var result = new
             {
                 status,
                 message,
-                data = user
+                data = user,
+                token
             };
 
-            return Ok(result);
+            return StatusCode(statusCode, result);
         }
 
         // [HttpGet]
@@ -87,10 +94,16 @@ namespace WebAPI.Controllers
         // {
         //     return await _context.User.ToListAsync();
         // }
-        [HttpGet("test")]
-        public String Test()
+        [HttpGet("user")]
+        public dynamic Test()
         {
-            return "result";
+            return HttpContext.Items["User"];
+        }
+        
+        [HttpPost("logout")]
+        public void logout()
+        {
+            
         }
 
         public static string EncodePassword(string originalPassword)

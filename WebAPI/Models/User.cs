@@ -14,14 +14,5 @@ namespace WebAPI.Models
         
         public string? Role { get; set; }
         
-        public string? Token { get; set; }
-        // public DateTime CreatedAt { get; set; }
-        // public DateTime UpdatedAt { get; set; }
-        
-        // public User()
-        // {          
-        //     this.CreatedAt  = DateTime.UtcNow;
-        //     this.UpdatedAt = DateTime.UtcNow;
-        // }
     }
 }

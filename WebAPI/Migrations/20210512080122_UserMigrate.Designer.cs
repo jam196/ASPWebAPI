@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20210506111821_UserMigrate")]
+    [Migration("20210512080122_UserMigrate")]
     partial class UserMigrate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
