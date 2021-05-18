@@ -10,6 +10,7 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
     }
 
     public DbSet<WebAPI.Models.User> User { get; set; }
+    public DbSet<WebAPI.Models.Bridge> Bridge { get; set; }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -24,16 +25,14 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
 
         foreach (var entry in entries)
         {
-            // for entities that inherit from BaseEntity,
-            // set UpdatedOn / CreatedOn appropriately
             if (entry.Entity is BaseEntity trackable)
             {
                 switch (entry.State)
                 {
                     case EntityState.Modified:
-                        trackable.CreatedAt = utcNow;
+                        trackable.UpdatedAt = utcNow;
 
-                        entry.Property("CreatedOn").IsModified = false;
+                        entry.Property("UpdatedAt").IsModified = false;
                         break;
 
                     case EntityState.Added:
