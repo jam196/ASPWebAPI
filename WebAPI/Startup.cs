@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,7 +40,19 @@ namespace WebAPI
 
             services.AddDbContext<DbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DbContext")));
+            
+            services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        var result = new BadRequestObjectResult(context.ModelState);
+                        result.ContentTypes.Add(MediaTypeNames.Application.Json);
 
+                        return result;
+                    };
+                });
+            
             // configure jwt authentication
             var key = Encoding.ASCII.GetBytes("E465A3CCC379D80B29DFB0F2D30276E1");
             services.AddAuthentication(x =>

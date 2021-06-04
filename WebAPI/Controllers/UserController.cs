@@ -13,37 +13,36 @@ namespace WebAPI.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class BridgeController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly DbContext _context;
 
-        public BridgeController(DbContext context)
+        public UserController(DbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Bridge
+        // GET: api/User
         [HttpGet]
-        public async Task<ObjectResult> GetBridge([FromQuery(Name = "page")] int page,
+        public async Task<ActionResult<IEnumerable<User>>> GetUser([FromQuery(Name = "page")] int page,
             [FromQuery(Name = "size")] int size, [FromQuery(Name = "filters[0][value]")]
             string filter)
         {
-            int totalRecords = await _context.Bridge.CountAsync();
+            int totalRecords = await _context.User.CountAsync();
             int lastPage = totalRecords / size;
             page = page > 0 ? page - 1 : page;
-            List<Bridge> data;
+            List<User> data;
 
             if (filter != null)
             {
-                data = await _context.Bridge
-                    .Where(s => s.Name.Contains(filter) || s.Investor.Contains(filter) || s.Designer.Contains(filter) ||
-                                 s.Builder.Contains(filter) || s.Supervisor.Contains(filter) || s.Manager.Contains(filter)|| s.Location.Contains(filter)).OrderByDescending(s => s.Id)
+                data = await _context.User
+                    .Where(s => s.Username.Contains(filter)).OrderByDescending(s => s.Id)
                     .Skip(page * size)
                     .Take(size).ToListAsync();
             }
             else
             {
-                data = await _context.Bridge.OrderByDescending(s => s.Id)
+                data = await _context.User.OrderByDescending(s => s.Id)
                     .Skip(page * size)
                     .Take(size).ToListAsync();
             }
@@ -58,47 +57,39 @@ namespace WebAPI.Controllers
             return StatusCode(200, result);
         }
 
-        // GET: api/Bridge/5
+        // GET: api/User/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Bridge>> GetBridge(int id)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            var bridge = await _context.Bridge.FindAsync(id);
+            var user = await _context.User.FindAsync(id);
 
-            if (bridge == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return bridge;
+            return user;
         }
 
-        // PUT: api/Bridge/5
+        // PUT: api/User/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBridge(int id, Bridge bridge)
+        public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != bridge.Id)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(bridge).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
-                String message = "Cập nhật thông tin cầu " + bridge.Name + " thành công!";
-                var result = new
-                {
-                    message,
-                    data = bridge
-                };
-
-                return StatusCode(200, result);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BridgeExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -111,44 +102,36 @@ namespace WebAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Bridge
+        // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Bridge>> PostBridge(Bridge bridge)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            String message = "Thêm thành công thông tin cầu " + bridge.Name + " vào hệ thống!";
-            _context.Bridge.Add(bridge);
+            _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            var result = new
-            {
-                message,
-                data = bridge
-            };
-
-            return StatusCode(200, result);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-
-        // DELETE: api/Bridge/5
+        // DELETE: api/User/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBridge(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var bridge = await _context.Bridge.FindAsync(id);
-            if (bridge == null)
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Bridge.Remove(bridge);
+            _context.User.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool BridgeExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Bridge.Any(e => e.Id == id);
+            return _context.User.Any(e => e.Id == id);
         }
     }
 }

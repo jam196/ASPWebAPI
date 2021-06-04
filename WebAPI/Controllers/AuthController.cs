@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
                 {
                     statusCode = 401;
                     status = "error";
-                    message = "Sai mật khẩu";
+                    message = "Bạn đã nhập sai mật khẩu, vui lòng thử lại!";
                 }
             }
             catch (Exception e)

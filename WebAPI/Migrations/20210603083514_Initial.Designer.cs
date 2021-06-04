@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20210518131103_Initial")]
+    [Migration("20210603083514_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,40 +25,56 @@ namespace WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Builder")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("DesignLoad")
-                        .HasColumnType("int");
+                    b.Property<float>("DesignLoad")
+                        .HasColumnType("float");
 
                     b.Property<string>("Designer")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("EndTime")
                         .HasColumnType("text");
 
+                    b.Property<string>("Investor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<float>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Manager")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NationalHighway")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("StartTime")
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Supervisor")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TotalInvestment")
-                        .HasColumnType("int");
+                    b.Property<float>("TotalInvestment")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
