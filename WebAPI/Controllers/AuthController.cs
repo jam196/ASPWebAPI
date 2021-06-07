@@ -55,12 +55,30 @@ namespace WebAPI.Controllers
             {
                 userData.Password = passwordHash;
                 userData.Role = "member";
+                userData.Avatar = "https://yt3.ggpht.com/Vai9EFHgVVYHlAax-zamzZUTqXV3pfBqxkHiMwafvtIwBDTTZfqKkiqoRmxT2I6bEJeL03AKgg=s1000-c-k-c0x00ffffff-no-rj";
                 _context.User.Add(userData);
                 _context.SaveChanges();
 
                 message = "Tạo tài khoản thành công";
 
                 user = userData;
+            }
+
+            if (status == "success")
+            {
+                History history = new History();
+                if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                    history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                if (userData.Name != null)
+                {
+                    history.Content = "Thành viên " + userData.Name +" vừa đăng nhập vào hệ thống";
+                }
+                else
+                {
+                    history.Content = "Thành viên " + userData.Username +" vừa đăng nhập vào hệ thống";
+                }
+                _context.History.Add(history);
+                _context.SaveChanges();
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();

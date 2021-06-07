@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.Models;
@@ -49,7 +50,7 @@ namespace WebAPI.Helpers
                 var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
                 // attach user to context on successful jwt validation
-                context.Items["User"] = dbContext.User.FirstOrDefault(u => u.Id == userId);
+                context.Items["User"] = dbContext.User.AsNoTracking().FirstOrDefault(u => u.Id == userId);
             }
             catch
             {

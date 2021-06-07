@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿#nullable enable
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.Models
 {
@@ -58,5 +59,8 @@ namespace WebAPI.Models
         // Trạng thái
         [Required(ErrorMessage = "Trạng thái không được bỏ trống")]
         public string Status { get; set; }
+
+        public int? UserId { get; set; }
+        public User? User { get; set; }
     }
 }

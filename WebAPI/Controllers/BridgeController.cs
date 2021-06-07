@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace WebAPI.Controllers
 {
@@ -86,8 +87,25 @@ namespace WebAPI.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
                 String message = "Cập nhật thông tin cầu " + bridge.Name + " thành công!";
+                
+                User userData = (User) HttpContext.Items["User"];
+                History history = new History();
+                if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                    history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                if (userData is {Name: { }})
+                {
+                    history.Content = "Thành viên " + userData.Name +" vừa cập nhật thông tin " + bridge.Name + " trong hệ thống";
+                }
+                else
+                {
+                    if (userData != null)
+                        history.Content = "Thành viên " + userData.Username + " vừa cập nhật thông tin " + bridge.Name +
+                                          " trong hệ thống";
+                }
+                _context.History.Add(history);
+                await _context.SaveChangesAsync();
+                
                 var result = new
                 {
                     message,
@@ -116,8 +134,29 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Bridge>> PostBridge(Bridge bridge)
         {
-            String message = "Thêm thành công thông tin cầu " + bridge.Name + " vào hệ thống!";
+            String message = "Thêm thành công " + bridge.Name + " vào hệ thống!";
+            User userData = (User) HttpContext.Items["User"];
+            if (userData != null)
+            {
+                bridge.UserId = userData.Id;
+            }
+            
             _context.Bridge.Add(bridge);
+            
+            History history = new History();
+            if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            if (userData is {Name: { }})
+            {
+                history.Content = "Thành viên " + userData.Name +" vừa thêm thành công " + bridge.Name + " vào hệ thống";
+            }
+            else
+            {
+                if (userData != null)
+                    history.Content = "Thành viên " + userData.Username + " vừa thêm thành công " + bridge.Name +
+                                      " vào hệ thống";
+            }
+            _context.History.Add(history);
             await _context.SaveChangesAsync();
 
             var result = new
@@ -141,6 +180,28 @@ namespace WebAPI.Controllers
             }
 
             _context.Bridge.Remove(bridge);
+            
+            User userData = (User) HttpContext.Items["User"];
+            if (userData != null)
+            {
+                bridge.UserId = userData.Id;
+            }
+
+            History history = new History();
+            if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            if (userData is {Name: { }})
+            {
+                history.Content = "Thành viên " + userData.Name +" đã xóa cầu " + bridge.Name + " khỏi hệ thống";
+            }
+            else
+            {
+                if (userData != null)
+                    history.Content = "Thành viên " + userData.Username + " đã xóa cầu " + bridge.Name +
+                                      " khỏi hệ thống";
+            }
+            _context.History.Add(history);
+            
             await _context.SaveChangesAsync();
 
             return NoContent();

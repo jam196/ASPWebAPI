@@ -37,6 +37,7 @@ namespace WebAPI.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("EndTime")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Investor")
@@ -47,6 +48,7 @@ namespace WebAPI.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<float>("Longitude")
@@ -61,6 +63,7 @@ namespace WebAPI.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("StartTime")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
@@ -77,9 +80,37 @@ namespace WebAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Bridge");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.History", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("History");
                 });
 
             modelBuilder.Entity("WebAPI.Models.User", b =>
@@ -88,8 +119,14 @@ namespace WebAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<string>("Avatar")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -108,6 +145,15 @@ namespace WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Bridge", b =>
+                {
+                    b.HasOne("WebAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
 
@@ -11,11 +13,19 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
 
     public DbSet<WebAPI.Models.User> User { get; set; }
     public DbSet<WebAPI.Models.Bridge> Bridge { get; set; }
+    public DbSet<WebAPI.Models.History> History { get; set; }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         OnBeforeSaving();
         return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+    
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+    {
+        OnBeforeSaving();
+        return (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
+            cancellationToken));
     }
 
     private void OnBeforeSaving()

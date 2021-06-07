@@ -160,7 +160,6 @@ E:\RiderProjects\ASPWebAPI\WebAPI\obj\Debug\net5.0\WebAPI.dll
 E:\RiderProjects\ASPWebAPI\WebAPI\obj\Debug\net5.0\ref\WebAPI.dll
 E:\RiderProjects\ASPWebAPI\WebAPI\obj\Debug\net5.0\WebAPI.pdb
 E:\RiderProjects\ASPWebAPI\WebAPI\obj\Debug\net5.0\WebAPI.genruntimeconfig.cache
-E:\RiderProjects\ASPWebAPI\WebAPI\bin\Debug\net5.0\WebDriver.dll
 E:\RiderProjects\ASPWebAPI\WebAPI\bin\Debug\net5.0\Microsoft.AspNetCore.Razor.Language.dll
 E:\RiderProjects\ASPWebAPI\WebAPI\bin\Debug\net5.0\Microsoft.Bcl.AsyncInterfaces.dll
 E:\RiderProjects\ASPWebAPI\WebAPI\bin\Debug\net5.0\Microsoft.CodeAnalysis.dll

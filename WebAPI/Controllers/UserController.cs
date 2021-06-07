@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace WebAPI.Controllers
 {
@@ -76,30 +79,59 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.Id)
+            String message = null;
+            int status = 200;
+            object result;
+            
+            User userData = (User) HttpContext.Items["User"];
+            if (userData != null && userData.Id != user.Id && userData.Role != "admin")
             {
-                return BadRequest();
+                message = "Bạn không có quyền thay đổi thông tin thành viên này";
+                status = 505;
             }
 
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
+            if (status == 200)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                message = "Cập nhật thông tin thành viên " + user.Username + " thành công!";
+                
+                if (userData != null && userData.Password != user.Password)
                 {
-                    return NotFound();
+                    user.Password = EncodePassword(user.Password);;
+                    message = "Đổi mật khẩu thành viên " + user.Username + " thành công!";
                 }
-                else
+                
+                _context.Entry(user).State = EntityState.Modified;
+                try
                 {
-                    throw;
+                    History history = new History();
+                    if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                        history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                    history.Content = "Admin vừa cập nhật thông tin thành viên " + user.Username + " trong hệ thống";
+                    _context.History.Add(history);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
+            
+            result = new
+            {
+                message,
+                data = user
+            };
 
-            return NoContent();
+            return StatusCode(status, result);
+
+            // return NoContent();
         }
 
         // POST: api/User
@@ -117,21 +149,64 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _context.User.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                User userData = (User) HttpContext.Items["User"];
+                if (userData != null && userData.Id != user.Id && userData.Role != "admin")
+                {
+                    return StatusCode(505, new
+                    {
+                        message = "Bạn không có quyền xóa thành viên này"
+                    });
+                }
+
+                _context.User.Remove(user);
+
+                History history = new History();
+                if (Request.HttpContext.Connection.RemoteIpAddress != null)
+                    history.IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                history.Content = "Admin đã xóa thành viên " + user.Username + " khỏi hệ thống";
+                _context.History.Add(history);
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (DbUpdateException)
+            {
+                return StatusCode(505, new
+                {
+                    message = "Thông tin thành viên này liên kết với một bản ghi khác trong hệ thống, không thể xóa!"
+                });
+            }
         }
 
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
+        }
+        
+        public static string EncodePassword(string originalPassword)
+        {
+            // //Declarations
+            Byte[] originalBytes;
+            Byte[] encodedBytes;
+            MD5 md5;
+
+            //Instantiate MD5CryptoServiceProvider, get bytes for original password and compute hash (encoded password)
+            md5 = new MD5CryptoServiceProvider();
+            originalBytes = Encoding.Default.GetBytes(originalPassword);
+            encodedBytes = md5.ComputeHash(originalBytes);
+
+            //Convert encoded bytes back to a 'readable' string
+            return BitConverter.ToString(encodedBytes).Replace("-", "");
+            ;
         }
     }
 }
